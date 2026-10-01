@@ -7,6 +7,25 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""Место работы"""
+type Experience {
+  """Название компании"""
+  company: String!
+
+  """Чем занимался"""
+  description: String
+
+  """Дата окончания. null — работает по настоящее время"""
+  endDate: DateTime
+  id: ID!
+
+  """Должность"""
+  position: String!
+
+  """Дата начала работы"""
+  startDate: DateTime!
+}
+
 """Профиль разработчика"""
 type Profile {
   createdAt: DateTime!
@@ -14,6 +33,9 @@ type Profile {
   """Краткое описание о себе"""
   description: String!
   email: String!
+
+  """Опыт работы"""
+  experiences: [Experience!]!
   githubUrl: String
   id: ID!
 

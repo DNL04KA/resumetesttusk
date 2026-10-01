@@ -1,0 +1,36 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""Профиль разработчика"""
+type Profile {
+  createdAt: DateTime!
+
+  """Краткое описание о себе"""
+  description: String!
+  email: String!
+  githubUrl: String
+  id: ID!
+
+  """Город"""
+  location: String
+
+  """Имя и фамилия"""
+  name: String!
+
+  """Должность"""
+  position: String!
+  telegram: String
+  updatedAt: DateTime!
+  websiteUrl: String
+}
+
+type Query {
+  """Профиль владельца визитки"""
+  profile: Profile!
+}

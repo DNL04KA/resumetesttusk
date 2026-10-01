@@ -25,6 +25,9 @@ type Profile {
 
   """Должность"""
   position: String!
+
+  """Навыки и технологии"""
+  skills: [Skill!]!
   telegram: String
   updatedAt: DateTime!
   websiteUrl: String
@@ -33,4 +36,24 @@ type Profile {
 type Query {
   """Профиль владельца визитки"""
   profile: Profile!
+}
+
+"""Навык разработчика"""
+type Skill {
+  category: SkillCategory!
+  id: ID!
+
+  """Уровень владения от 1 до 5"""
+  level: Int!
+
+  """Название технологии"""
+  name: String!
+}
+
+"""Категория навыка"""
+enum SkillCategory {
+  DATABASE
+  FRAMEWORK
+  LANGUAGE
+  TOOL
 }

@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SkillCategory {
+  LANGUAGE
+  FRAMEWORK
+  DATABASE
+  TOOL
+}
+
+model Profile {
+  id          Int      @id @default(autoincrement())
+  name        String
+  position    String
+  description String
+  email       String   @unique
+  location    String?
+  githubUrl   String?
+  websiteUrl  String?
+  telegram    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  skills      Skill[]
+  experiences Experience[]
+  projects    Project[]
+}
+
+model Skill {
+  id       Int           @id @default(autoincrement())
+  name     String
+  category SkillCategory
+  level    Int           @default(3)
+
+  profileId Int
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, name])
+  @@index([profileId])
+}
+
+model Experience {
+  id          Int       @id @default(autoincrement())
+  company     String
+  position    String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+
+  profileId Int
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+model Project {
+  id           Int      @id @default(autoincrement())
+  name         String
+  description  String
+  technologies String[]
+  repoUrl      String?
+  demoUrl      String?
+  createdAt    DateTime @default(now())
+
+  profileId Int
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}

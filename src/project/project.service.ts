@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { Project } from '../generated/prisma/client.js';
 
@@ -11,5 +11,15 @@ export class ProjectService {
       where: { profileId },
       orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
     });
+  }
+
+  async findById(id: number): Promise<Project> {
+    const project = await this.prisma.project.findUnique({ where: { id } });
+
+    if (project === null) {
+      throw new NotFoundException(`Проект с id ${id} не найден`);
+    }
+
+    return project;
   }
 }

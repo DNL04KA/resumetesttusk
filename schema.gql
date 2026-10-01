@@ -82,6 +82,9 @@ type Project {
 type Query {
   """Профиль владельца визитки"""
   profile: Profile!
+
+  """Проект по идентификатору"""
+  project(id: ID!): Project!
 }
 
 """Навык разработчика"""

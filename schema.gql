@@ -48,11 +48,35 @@ type Profile {
   """Должность"""
   position: String!
 
+  """Проекты из портфолио"""
+  projects: [Project!]!
+
   """Навыки и технологии"""
   skills: [Skill!]!
   telegram: String
   updatedAt: DateTime!
   websiteUrl: String
+}
+
+"""Проект из портфолио"""
+type Project {
+  createdAt: DateTime!
+
+  """Ссылка на демо. null — проект не задеплоен"""
+  demoUrl: String
+
+  """Описание проекта"""
+  description: String!
+  id: ID!
+
+  """Название проекта"""
+  name: String!
+
+  """Ссылка на репозиторий. null — репозиторий недоступен"""
+  repoUrl: String
+
+  """Использованные технологии"""
+  technologies: [String!]!
 }
 
 type Query {

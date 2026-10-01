@@ -1,6 +1,8 @@
 import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Experience } from '../experience/entities/experience.entity.js';
 import { ExperienceService } from '../experience/experience.service.js';
+import { Project } from '../project/entities/project.entity.js';
+import { ProjectService } from '../project/project.service.js';
 import { Skill } from '../skill/entities/skill.entity.js';
 import { SkillService } from '../skill/skill.service.js';
 import { Profile } from './entities/profile.entity.js';
@@ -12,6 +14,7 @@ export class ProfileResolver {
     private readonly profileService: ProfileService,
     private readonly skillService: SkillService,
     private readonly experienceService: ExperienceService,
+    private readonly projectService: ProjectService,
   ) {}
 
   @Query(() => Profile, { description: 'Профиль владельца визитки' })
@@ -27,5 +30,10 @@ export class ProfileResolver {
   @ResolveField(() => [Experience], { description: 'Опыт работы' })
   experiences(@Parent() profile: Profile): Promise<Experience[]> {
     return this.experienceService.findByProfileId(profile.id);
+  }
+
+  @ResolveField(() => [Project], { description: 'Проекты из портфолио' })
+  projects(@Parent() profile: Profile): Promise<Project[]> {
+    return this.projectService.findByProfileId(profile.id);
   }
 }

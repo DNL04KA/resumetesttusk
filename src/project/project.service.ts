@@ -6,6 +6,13 @@ import type { Project } from '../generated/prisma/client.js';
 export class ProjectService {
   constructor(private readonly prisma: PrismaService) {}
 
+  findAll(technology?: string): Promise<Project[]> {
+    return this.prisma.project.findMany({
+      where: technology ? { technologies: { has: technology } } : undefined,
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    });
+  }
+
   findByProfileId(profileId: number): Promise<Project[]> {
     return this.prisma.project.findMany({
       where: { profileId },

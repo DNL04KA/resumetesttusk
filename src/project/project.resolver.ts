@@ -13,4 +13,17 @@ export class ProjectResolver {
   ): Promise<Project> {
     return this.projectService.findById(id);
   }
+
+  @Query(() => [Project], {
+    description: 'Список проектов, при необходимости отфильтрованный по технологии',
+  })
+  projects(
+    @Args('technology', {
+      nullable: true,
+      description: 'Точное название технологии, с учётом регистра',
+    })
+    technology?: string,
+  ): Promise<Project[]> {
+    return this.projectService.findAll(technology);
+  }
 }

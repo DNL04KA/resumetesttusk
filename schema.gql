@@ -35,7 +35,10 @@ type Profile {
   email: String!
 
   """Опыт работы"""
-  experiences: [Experience!]!
+  experiences(
+    """Направление сортировки по дате начала работы"""
+    order: SortOrder! = DESC
+  ): [Experience!]!
   githubUrl: String
   id: ID!
 
@@ -111,4 +114,10 @@ enum SkillCategory {
   FRAMEWORK
   LANGUAGE
   TOOL
+}
+
+"""Направление сортировки"""
+enum SortOrder {
+  ASC
+  DESC
 }

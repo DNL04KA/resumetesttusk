@@ -1,4 +1,5 @@
-import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { SortOrder } from '../common/sort-order.enum.js';
 import { Experience } from '../experience/entities/experience.entity.js';
 import { ExperienceService } from '../experience/experience.service.js';
 import { Project } from '../project/entities/project.entity.js';
@@ -28,8 +29,16 @@ export class ProfileResolver {
   }
 
   @ResolveField(() => [Experience], { description: 'Опыт работы' })
-  experiences(@Parent() profile: Profile): Promise<Experience[]> {
-    return this.experienceService.findByProfileId(profile.id);
+  experiences(
+    @Parent() profile: Profile,
+    @Args('order', {
+      type: () => SortOrder,
+      defaultValue: SortOrder.DESC,
+      description: 'Направление сортировки по дате начала работы',
+    })
+    order: SortOrder,
+  ): Promise<Experience[]> {
+    return this.experienceService.findByProfileId(profile.id, order);
   }
 
   @ResolveField(() => [Project], { description: 'Проекты из портфолио' })

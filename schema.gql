@@ -26,6 +26,11 @@ type Experience {
   startDate: DateTime!
 }
 
+type Mutation {
+  """Обновить профиль владельца визитки"""
+  updateProfile(input: UpdateProfileInput!): Profile!
+}
+
 """Профиль разработчика"""
 type Profile {
   createdAt: DateTime!
@@ -120,4 +125,16 @@ enum SkillCategory {
 enum SortOrder {
   ASC
   DESC
+}
+
+"""Поля профиля для обновления. Все необязательны"""
+input UpdateProfileInput {
+  description: String
+  email: String
+  githubUrl: String
+  location: String
+  name: String
+  position: String
+  telegram: String
+  websiteUrl: String
 }

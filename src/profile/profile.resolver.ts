@@ -1,4 +1,11 @@
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { SortOrder } from '../common/sort-order.enum.js';
 import { Experience } from '../experience/entities/experience.entity.js';
 import { ExperienceService } from '../experience/experience.service.js';
@@ -6,6 +13,7 @@ import { Project } from '../project/entities/project.entity.js';
 import { ProjectService } from '../project/project.service.js';
 import { Skill } from '../skill/entities/skill.entity.js';
 import { SkillService } from '../skill/skill.service.js';
+import { UpdateProfileInput } from './dto/update-profile.input.js';
 import { Profile } from './entities/profile.entity.js';
 import { ProfileService } from './profile.service.js';
 
@@ -21,6 +29,13 @@ export class ProfileResolver {
   @Query(() => Profile, { description: 'Профиль владельца визитки' })
   profile(): Promise<Profile> {
     return this.profileService.findOne();
+  }
+
+  @Mutation(() => Profile, { description: 'Обновить профиль владельца визитки' })
+  updateProfile(
+    @Args('input') input: UpdateProfileInput,
+  ): Promise<Profile> {
+    return this.profileService.update(input);
   }
 
   @ResolveField(() => [Skill], { description: 'Навыки и технологии' })

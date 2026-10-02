@@ -12,7 +12,10 @@ const STATUS_TO_CODE: Record<number, string> = {
   404: 'NOT_FOUND',
 };
 
-type NestOriginalError = { statusCode?: number };
+type NestOriginalError = {
+  statusCode?: number;
+  message?: string | string[];
+};
 
 export function formatGraphQLError(
   error: GraphQLFormattedError,
@@ -27,10 +30,16 @@ export function formatGraphQLError(
       ? (error.extensions?.['code'] ?? 'INTERNAL_SERVER_ERROR')
       : (STATUS_TO_CODE[statusCode] ?? 'INTERNAL_SERVER_ERROR');
 
+  // ValidationPipe складывает список нарушений в originalError.message,
+  // а сверху оставляет бесполезное "Bad Request Exception".
+  const validationErrors = Array.isArray(originalError?.message)
+    ? originalError.message
+    : undefined;
+
   return {
-    message: error.message,
+    message: validationErrors?.join('; ') ?? error.message,
     path: error.path,
     locations: error.locations,
-    extensions: { code },
+    extensions: validationErrors ? { code, validationErrors } : { code },
   };
 }

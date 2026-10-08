@@ -8,37 +8,41 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
-const PROFILE_EMAIL = 'dev@example.com';
+const PROFILE_EMAIL = 'nesterovichds0512@gmail.com';
 
 async function main(): Promise<void> {
   const profile = await prisma.profile.upsert({
     where: { email: PROFILE_EMAIL },
     update: {},
     create: {
-      name: 'Иван Разработчиков',
-      position: 'Backend Developer',
+      name: 'Даниил Нестерович',
+      position: 'Мобильный разработчик (iOS / Android)',
       description:
-        'Разрабатываю серверные приложения на TypeScript и Node.js. Интересуюсь базами данных и проектированием API.',
+        'Мобильный разработчик под iOS и Android. Пишу на Swift, Kotlin и Flutter, выпускал релизы в App Store и Google Play, работал с подписками и платежами на iOS. Умею разбираться в чужой кодовой базе и доводить фичу от API до релиза.',
       email: PROFILE_EMAIL,
-      location: 'Москва',
-      githubUrl: 'https://github.com/example',
-      websiteUrl: 'https://example.com',
-      telegram: '@example',
+      location: 'Минск',
+      githubUrl: 'https://github.com/DNL04KA',
+      websiteUrl: null,
+      telegram: 'https://t.me/dnl04ka',
     },
   });
 
   await prisma.skill.deleteMany({ where: { profileId: profile.id } });
   await prisma.skill.createMany({
     data: [
-      { name: 'TypeScript', category: SkillCategory.LANGUAGE, level: 4, profileId: profile.id },
-      { name: 'JavaScript', category: SkillCategory.LANGUAGE, level: 4, profileId: profile.id },
-      { name: 'SQL', category: SkillCategory.LANGUAGE, level: 3, profileId: profile.id },
-      { name: 'NestJS', category: SkillCategory.FRAMEWORK, level: 4, profileId: profile.id },
-      { name: 'GraphQL', category: SkillCategory.FRAMEWORK, level: 3, profileId: profile.id },
+      { name: 'Swift', category: SkillCategory.LANGUAGE, level: 4, profileId: profile.id },
+      { name: 'Kotlin', category: SkillCategory.LANGUAGE, level: 4, profileId: profile.id },
+      { name: 'TypeScript', category: SkillCategory.LANGUAGE, level: 3, profileId: profile.id },
+      { name: 'Python', category: SkillCategory.LANGUAGE, level: 3, profileId: profile.id },
+      { name: 'SwiftUI', category: SkillCategory.FRAMEWORK, level: 3, profileId: profile.id },
+      { name: 'Jetpack Compose', category: SkillCategory.FRAMEWORK, level: 4, profileId: profile.id },
+      { name: 'Flutter / Dart', category: SkillCategory.FRAMEWORK, level: 4, profileId: profile.id },
+      { name: 'React / Next.js', category: SkillCategory.FRAMEWORK, level: 3, profileId: profile.id },
       { name: 'PostgreSQL', category: SkillCategory.DATABASE, level: 3, profileId: profile.id },
-      { name: 'Prisma', category: SkillCategory.DATABASE, level: 3, profileId: profile.id },
-      { name: 'Docker', category: SkillCategory.TOOL, level: 3, profileId: profile.id },
       { name: 'Git', category: SkillCategory.TOOL, level: 4, profileId: profile.id },
+      { name: 'REST API', category: SkillCategory.TOOL, level: 4, profileId: profile.id },
+      { name: 'MVVM', category: SkillCategory.TOOL, level: 4, profileId: profile.id },
+      { name: 'Claude Code / Codex', category: SkillCategory.TOOL, level: 4, profileId: profile.id },
     ],
   });
 
@@ -46,21 +50,12 @@ async function main(): Promise<void> {
   await prisma.experience.createMany({
     data: [
       {
-        company: 'ООО «Пример»',
-        position: 'Junior Backend Developer',
+        company: 'Sport TV',
+        position: 'Mobile Developer',
         description:
-          'Поддержка и доработка REST API на Node.js, написание SQL-запросов, участие в код-ревью.',
-        startDate: new Date('2024-06-01'),
-        endDate: new Date('2025-08-31'),
-        profileId: profile.id,
-      },
-      {
-        company: 'Фриланс',
-        position: 'Backend Developer',
-        description:
-          'Разработка backend-части небольших сервисов: проектирование схемы БД, GraphQL API, деплой в Docker.',
-        startDate: new Date('2025-09-01'),
-        endDate: null,
+          'Развивал приложение для спортивного стриминга на Flutter под iOS и Android. Разбирал подписки и платежи на iOS в нативном Swift. Интегрировал приложение с бэкендом по REST API, исправлял ошибки в существующей кодовой базе, выпускал релизы в App Store и Google Play.',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2026-08-31'),
         profileId: profile.id,
       },
     ],
@@ -70,29 +65,43 @@ async function main(): Promise<void> {
   await prisma.project.createMany({
     data: [
       {
-        name: 'Digital Business Card',
+        name: 'Нативный клиент для Android TV',
         description:
-          'GraphQL API цифровой визитки разработчика: профиль, навыки, опыт и проекты.',
-        technologies: ['TypeScript', 'NestJS', 'GraphQL', 'Prisma', 'PostgreSQL', 'Docker'],
-        repoUrl: 'https://github.com/example/digital-card',
+          'Приложение для просмотра спортивных трансляций на Android TV с управлением с пульта. Архитектура MVVM, видеоплеер на Media3, сетевой слой с переподключением при обрывах сети.',
+        technologies: [
+          'Kotlin',
+          'Compose for TV',
+          'Media3 / ExoPlayer',
+          'Hilt',
+          'Coroutines',
+          'Retrofit',
+        ],
+        repoUrl: null,
         demoUrl: null,
         profileId: profile.id,
       },
       {
-        name: 'Task Tracker API',
+        name: 'MAPA (в разработке)',
         description:
-          'REST API для учёта задач с аутентификацией по JWT и ролевой моделью доступа.',
-        technologies: ['TypeScript', 'NestJS', 'PostgreSQL'],
-        repoUrl: 'https://github.com/example/task-tracker',
+          'iOS-приложение для путешественников. На карте мира закрашиваются посещённые страны, есть маршруты по странам, в планах подписка MAPA+.',
+        technologies: ['Swift', 'SwiftUI'],
+        repoUrl: null,
         demoUrl: null,
         profileId: profile.id,
       },
       {
-        name: 'Currency Rates Bot',
+        name: 'Askbase',
         description:
-          'Telegram-бот, который отдаёт курсы валют по расписанию и хранит историю запросов.',
-        technologies: ['Node.js', 'TypeScript', 'PostgreSQL'],
-        repoUrl: 'https://github.com/example/rates-bot',
+          'SaaS-конструктор AI-чатботов. Компания загружает документы и получает чат-бота для своего сайта, который отвечает по этим документам.',
+        technologies: [
+          'Next.js',
+          'TypeScript',
+          'React',
+          'Supabase',
+          'PostgreSQL',
+          'OpenAI API',
+        ],
+        repoUrl: null,
         demoUrl: null,
         profileId: profile.id,
       },

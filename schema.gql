@@ -91,6 +91,9 @@ type Query {
   """Профиль владельца визитки"""
   profile: Profile!
 
+  """Список профилей"""
+  profiles: [Profile!]!
+
   """Проект по идентификатору"""
   project(id: ID!): Project!
 

@@ -16,4 +16,15 @@ export class ExperienceService {
       orderBy: [{ startDate: order }, { id: order }],
     });
   }
+
+  /**
+   * Всегда возвращает записи в DESC — это каноническое представление,
+   * которое кладётся в кэш DataLoader. ASC получается разворотом массива.
+   */
+  findByProfileIds(profileIds: number[]): Promise<Experience[]> {
+    return this.prisma.experience.findMany({
+      where: { profileId: { in: profileIds } },
+      orderBy: [{ startDate: 'desc' }, { id: 'desc' }],
+    });
+  }
 }

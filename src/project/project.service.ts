@@ -20,6 +20,13 @@ export class ProjectService {
     });
   }
 
+  findByProfileIds(profileIds: number[]): Promise<Project[]> {
+    return this.prisma.project.findMany({
+      where: { profileId: { in: profileIds } },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    });
+  }
+
   async findById(id: number): Promise<Project> {
     const project = await this.prisma.project.findUnique({ where: { id } });
 

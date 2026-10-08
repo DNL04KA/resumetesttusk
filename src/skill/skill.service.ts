@@ -12,4 +12,11 @@ export class SkillService {
       orderBy: [{ category: 'asc' }, { name: 'asc' }],
     });
   }
+
+  findByProfileIds(profileIds: number[]): Promise<Skill[]> {
+    return this.prisma.skill.findMany({
+      where: { profileId: { in: profileIds } },
+      orderBy: [{ category: 'asc' }, { name: 'asc' }],
+    });
+  }
 }

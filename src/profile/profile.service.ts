@@ -20,6 +20,10 @@ export class ProfileService {
     return profile;
   }
 
+  findAll(): Promise<Profile[]> {
+    return this.prisma.profile.findMany({ orderBy: { id: 'asc' } });
+  }
+
   async update(data: Prisma.ProfileUpdateInput): Promise<Profile> {
     const current = await this.findOne();
 

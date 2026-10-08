@@ -1,0 +1,22 @@
+# зависимости и сборка — ставятся и собираются внутри образа
+node_modules
+dist
+src/generated
+coverage
+
+# секреты
+.env
+.env.local
+.env.*.local
+
+# git и локальное окружение
+.git
+.gitignore
+.DS_Store
+*.log
+
+# не нужно в образе
+*.spec.ts
+vitest.config.ts
+README.md
+schema.gql

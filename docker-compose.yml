@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: devcard-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: devcard
+    # 5433 снаружи: порт 5432 на хосте занят локальным PostgreSQL
+    ports:
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d devcard']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Разовая задача: применить миграции и залить начальные данные.
+  # Собирается из стадии builder, где есть prisma CLI и tsx.
+  migrate:
+    build:
+      context: .
+      target: builder
+    container_name: devcard-migrate
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/devcard?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      target: runtime
+    container_name: devcard-app
+    environment:
+      # хост db — имя сервиса в сети compose, не localhost
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/devcard?schema=public
+      PORT: 3000
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/graphql',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({query:'{__typename}'})}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  pgdata:

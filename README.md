@@ -1,124 +1,251 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Digital Business Card API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+GraphQL API цифровой визитки разработчика: профиль, навыки, опыт работы и проекты.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Стек
 
-## Description
+TypeScript · NestJS 12 · GraphQL (Apollo Server 5) · Prisma 7 · PostgreSQL 16 · Docker
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Архитектура
 
-## Project setup
-
-```bash
-$ npm install
+```
+GraphQL Resolver  →  DataLoader  →  Service  →  Prisma  →  PostgreSQL
 ```
 
-## Compile and run the project
+- **Resolver** — транспортный слой: принимает запрос, передаёт аргументы дальше. Prisma не вызывает.
+- **DataLoader** — батчинг связанных сущностей, только для relation-полей.
+- **Service** — бизнес-логика и доступ к данным через Prisma.
+- **PrismaService** — обёртка над `PrismaClient` с подключением и graceful shutdown.
 
-```bash
-# development
-$ npm run start
+Код разбит по доменам (`profile`, `skill`, `experience`, `project`), каждый домен — отдельный модуль NestJS.
 
-# watch mode
-$ npm run start:dev
+## Структура
 
-# production mode
-$ npm run start:prod
+```
+prisma/
+  schema.prisma          модели и связи
+  migrations/            SQL-миграции
+  seed.ts                идемпотентное наполнение базы
+src/
+  main.ts                точка входа, ValidationPipe, shutdown hooks
+  app.module.ts          корневой модуль, конфигурация GraphQL
+  common/
+    sort-order.enum.ts   GraphQL enum ASC | DESC
+    format-graphql-error.ts  перевод исключений Nest в коды GraphQL
+  prisma/                PrismaService + PrismaModule
+  profile/               резолвер, сервис, ObjectType, InputType
+  skill/                 сервис, loader, ObjectType
+  experience/            сервис, loader, ObjectType
+  project/               резолвер, сервис, loader, ObjectType
+Dockerfile
+docker-compose.yml
 ```
 
-## Run tests
+## Модель данных
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```
+Profile 1 ──< Skill
+        1 ──< Experience
+        1 ──< Project
 ```
 
-## Deployment
+Все связи — One-to-Many с `onDelete: Cascade`. На внешних ключах созданы индексы (PostgreSQL не создаёт их автоматически).
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Локальный запуск
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
+Нужны Node.js 20+ и запущенный PostgreSQL.
 
 ```bash
-$ npm install @nestjs/observe
+npm ci
+cp .env.example .env          # укажите свою строку подключения
+createdb devcard
+npm run db:migrate
+npm run db:generate
+npm run db:seed
+npm run start:dev
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
+Приложение поднимается на `http://localhost:3000`.
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+## Запуск через Docker Compose
 
-## Resources
+```bash
+docker compose up --build
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Поднимаются три сервиса:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Сервис | Назначение |
+|---|---|
+| `db` | PostgreSQL 16, healthcheck через `pg_isready`, данные в volume `pgdata` |
+| `migrate` | разовая задача: `prisma migrate deploy` + `prisma db seed`, затем завершается |
+| `app` | приложение, стартует только после успешного `migrate` |
 
-## Support
+Порт PostgreSQL наружу — **5433**, чтобы не конфликтовать с локально установленным сервером.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Полный перезапуск с чистой базой:
 
-## Stay in touch
+```bash
+docker compose down -v && docker compose up --build
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Миграции
 
-## License
+```bash
+npm run db:migrate     # создать и применить миграцию (разработка)
+npm run db:deploy      # применить существующие миграции (Docker, прод)
+npm run db:generate    # пересобрать Prisma Client после правки схемы
+npm run db:reset       # пересоздать базу и применить всё заново
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+После изменения `schema.prisma` нужны обе команды: `db:migrate` и `db:generate` — в Prisma 7 миграция больше не генерирует клиент автоматически.
+
+## Seed
+
+```bash
+npm run db:seed
+```
+
+Скрипт идемпотентен: профиль обновляется через `upsert` по уникальному `email`, дочерние сущности пересоздаются. Повторный запуск не дублирует данные.
+
+## GraphQL
+
+Endpoint: `POST /graphql`
+Apollo Sandbox: `http://localhost:3000/graphql` в браузере.
+
+Схема генерируется из TypeScript-классов (code-first) и сохраняется в [schema.gql](schema.gql).
+
+### Основные запросы
+
+```graphql
+# профиль со всеми связями
+query {
+  profile {
+    name
+    position
+    skills { name category level }
+    experiences { company position startDate endDate }
+    projects { name technologies repoUrl }
+  }
+}
+
+# список профилей
+query {
+  profiles { id name skills { name } }
+}
+
+# проект по идентификатору
+query {
+  project(id: 4) { name description technologies }
+}
+
+# фильтр проектов по технологии (точное совпадение, с учётом регистра)
+query {
+  projects(technology: "NestJS") { name technologies }
+}
+
+# сортировка опыта работы
+query {
+  profile {
+    experiences(order: ASC) { company startDate }
+  }
+}
+```
+
+### Мутация
+
+```graphql
+mutation {
+  updateProfile(input: { position: "Mobile Developer", location: "Минск" }) {
+    name
+    position
+    location
+    updatedAt
+  }
+}
+```
+
+Все поля `UpdateProfileInput` необязательны — не переданные поля не затрагиваются. Входные данные проверяются `class-validator` (`@IsEmail`, `@IsUrl`, `@IsNotEmpty`).
+
+## Обработка ошибок
+
+Исключения NestJS переводятся в прикладные коды GraphQL в [format-graphql-error.ts](src/common/format-graphql-error.ts). Из ответа убираются `stacktrace` и внутренние поля.
+
+| Ситуация | HTTP | `extensions.code` |
+|---|---|---|
+| поля нет в схеме | 400 | `GRAPHQL_VALIDATION_FAILED` |
+| невалидный аргумент или input | 200 | `BAD_USER_INPUT` |
+| запись не найдена | 200 | `NOT_FOUND` |
+
+HTTP 400 возвращается только когда запрос не прошёл проверку схемой — то есть до выполнения резолверов. Ошибки времени выполнения по спецификации GraphQL-over-HTTP отдаются со статусом 200 и заполненным массивом `errors`.
+
+Ошибки валидации приходят списком в `extensions.validationErrors`.
+
+## DataLoader и проблема N+1
+
+Связи профиля (`skills`, `experiences`, `projects`) резолвятся через `@ResolveField`. Это даёт ленивость — незапрошенные связи не вызывают запросов к базе, — но при списке профилей порождает N+1: по одному запросу на каждую связь каждого профиля.
+
+Решение — `DataLoader` на каждую связь. Обращения, сделанные в рамках одного GraphQL-запроса, собираются в один `WHERE profileId IN (...)`, результат группируется по владельцам и раздаётся в порядке ключей.
+
+Loader'ы объявлены с `Scope.REQUEST`: экземпляр и его кэш живут ровно один запрос, что исключает отдачу устаревших или чужих данных.
+
+### Измеренный эффект
+
+Один и тот же запрос на 4 профилях:
+
+```graphql
+query {
+  profiles { id name skills { name } experiences { company } projects { name } }
+}
+```
+
+| | SQL-запросов |
+|---|---|
+| прямые вызовы сервисов | **13** = 1 + 3×4 |
+| через DataLoader | **4** = 1 + 3 |
+
+```sql
+-- было: 1 + 3N
+SELECT ... FROM "Profile"
+SELECT ... FROM "Skill"      WHERE "profileId" = $1     -- ×4
+SELECT ... FROM "Experience" WHERE "profileId" = $1     -- ×4
+SELECT ... FROM "Project"    WHERE "profileId" = $1     -- ×4
+
+-- стало: 1 + 3
+SELECT ... FROM "Profile"
+SELECT ... FROM "Skill"      WHERE "profileId" IN ($1,$2,$3,$4)
+SELECT ... FROM "Experience" WHERE "profileId" IN ($1,$2,$3,$4)
+SELECT ... FROM "Project"    WHERE "profileId" IN ($1,$2,$3,$4)
+```
+
+Число запросов перестало зависеть от размера списка. Ленивость сохранена: `profiles { id name }` по-прежнему выполняет один запрос.
+
+Увидеть SQL можно, запустив приложение с `PRISMA_LOG_QUERIES=true`.
+
+## Тесты
+
+```bash
+npm test
+```
+
+Юнит-тесты loader'ов: группировка строк по владельцам, порядок ключей, пустой результат и проверка того, что сортировка `ASC` не мутирует кэш DataLoader. Базы данных не требуют.
+
+## Технические решения
+
+- **GraphQL вместо REST** — резюме это дерево связанных сущностей, клиент сам выбирает нужные поля за один запрос.
+- **Отдельные GraphQL-типы, а не Prisma-модели** — публичный контракт API отделён от структуры базы: изменение схемы БД не ломает клиентов, служебные поля наружу не попадают.
+- **`@ResolveField` + DataLoader вместо `include`** — `include` грузил бы связи всегда, даже когда клиент их не запросил.
+- **`technologies` как массив строк, а не отдельная таблица** — свободные теги без собственного жизненного цикла. Платой стала чувствительность фильтра к регистру и отсутствие справочника; при появлении атрибутов у технологии потребуется модель `Technology` и связь many-to-many.
+- **`endDate` nullable** — `null` означает «работает по настоящее время», а не отсутствие данных.
+- **Миграции отдельным сервисом Compose** — разовая задача не должна выполняться в каждой реплике приложения.
+- **Prisma 7 с driver adapter `@prisma/adapter-pg`** — в седьмой версии подключение идёт через обычный драйвер `pg`.
+
+## Переменные окружения
+
+| Переменная | Назначение |
+|---|---|
+| `DATABASE_URL` | строка подключения к PostgreSQL |
+| `PORT` | порт HTTP-сервера, по умолчанию 3000 |
+| `PRISMA_LOG_QUERIES` | `true` — логировать SQL-запросы |
+
+Шаблон — в [.env.example](.env.example). Файл `.env` в репозиторий не коммитится.

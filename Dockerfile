@@ -40,3 +40,13 @@ USER node
 EXPOSE 3000
 
 CMD ["node", "dist/main.js"]
+
+# ---------- запуск на платформе с одним контейнером ----------
+# Compose выполняет миграции отдельным сервисом, но Render, Railway и
+# подобные разворачивают один контейнер, поэтому здесь миграции и seed
+# выполняются при старте приложения.
+FROM builder AS deploy
+
+EXPOSE 3000
+
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node dist/main.js"]

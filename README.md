@@ -124,7 +124,7 @@ query {
     name
     position
     skills { name category level }
-    experiences { company position startDate endDate }
+    experience { company position startDate endDate }
     projects { name technologies repoUrl }
   }
 }
@@ -147,7 +147,7 @@ query {
 # сортировка опыта работы
 query {
   profile {
-    experiences(order: ASC) { company startDate }
+    experience(order: ASC) { company startDate }
   }
 }
 ```
@@ -195,7 +195,7 @@ Loader'ы объявлены с `Scope.REQUEST`: экземпляр и его к
 
 ```graphql
 query {
-  profiles { id name skills { name } experiences { company } projects { name } }
+  profiles { id name skills { name } experience { company } projects { name } }
 }
 ```
 

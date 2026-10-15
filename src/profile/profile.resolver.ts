@@ -48,7 +48,9 @@ export class ProfileResolver {
     return this.skillLoader.load(profile.id);
   }
 
-  @ResolveField(() => [Experience], { description: 'Опыт работы' })
+  @ResolveField('experience', () => [Experience], {
+    description: 'Опыт работы',
+  })
   experiences(
     @Parent() profile: Profile,
     @Args('order', {

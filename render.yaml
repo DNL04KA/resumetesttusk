@@ -1,0 +1,21 @@
+databases:
+  - name: devcard-db
+    databaseName: devcard
+    user: devcard
+    plan: free
+
+services:
+  - type: web
+    name: devcard-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /graphql
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: devcard-db
+          property: connectionString
+      - key: PORT
+        value: 3000

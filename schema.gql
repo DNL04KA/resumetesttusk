@@ -40,7 +40,7 @@ type Profile {
   email: String!
 
   """Опыт работы"""
-  experiences(
+  experience(
     """Направление сортировки по дате начала работы"""
     order: SortOrder! = DESC
   ): [Experience!]!

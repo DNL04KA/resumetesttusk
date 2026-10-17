@@ -53,7 +53,13 @@ async function main(): Promise<void> {
         company: 'Sport TV',
         position: 'Mobile Developer',
         description:
-          'Развивал приложение для спортивного стриминга на Flutter под iOS и Android. Разбирал подписки и платежи на iOS в нативном Swift. Интегрировал приложение с бэкендом по REST API, исправлял ошибки в существующей кодовой базе, выпускал релизы в App Store и Google Play.',
+          'Развитие приложения для спортивного стриминга на Flutter под iOS и Android.',
+        achievements: [
+          'Выпустил релизы приложения в App Store и Google Play',
+          'Реализовал нативный слой подписок и платежей на iOS на Swift внутри Flutter-приложения',
+          'Интегрировал приложение с бэкендом по REST API и довёл функциональность от контракта до релиза',
+          'Разобрался в существующей кодовой базе и стабилизировал её, исправляя накопившиеся ошибки',
+        ],
         startDate: new Date('2024-01-01'),
         endDate: new Date('2026-08-31'),
         profileId: profile.id,

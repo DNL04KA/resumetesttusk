@@ -14,6 +14,9 @@ export class Experience {
   @Field(() => String, { nullable: true, description: 'Чем занимался' })
   description: string | null;
 
+  @Field(() => [String], { description: 'Достижения на этом месте работы' })
+  achievements: string[];
+
   @Field(() => GraphQLISODateTime, { description: 'Дата начала работы' })
   startDate: Date;
 

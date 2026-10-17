@@ -9,6 +9,9 @@ scalar DateTime
 
 """Место работы"""
 type Experience {
+  """Достижения на этом месте работы"""
+  achievements: [String!]!
+
   """Название компании"""
   company: String!
 

@@ -13,7 +13,7 @@ async function bootstrap(): Promise<void> {
   // сканированием внешнего интерфейса, а не loopback.
   await app.listen(port, '0.0.0.0');
 
-  new Logger('Bootstrap').log(`Приложение слушает http://localhost:${port}`);
+  new Logger('Bootstrap').log(`Приложение слушает порт ${port}`);
 }
 
 await bootstrap();

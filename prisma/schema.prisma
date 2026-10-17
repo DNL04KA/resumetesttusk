@@ -46,12 +46,13 @@ model Skill {
 }
 
 model Experience {
-  id          Int       @id @default(autoincrement())
-  company     String
-  position    String
-  description String?
-  startDate   DateTime
-  endDate     DateTime?
+  id           Int       @id @default(autoincrement())
+  company      String
+  position     String
+  description  String?
+  achievements String[]
+  startDate    DateTime
+  endDate      DateTime?
 
   profileId Int
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)

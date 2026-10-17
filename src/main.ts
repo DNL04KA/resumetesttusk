@@ -9,7 +9,9 @@ async function bootstrap(): Promise<void> {
   app.useGlobalPipes(new ValidationPipe());
 
   const port = app.get(ConfigService).get<number>('PORT') ?? 3000;
-  await app.listen(port);
+  // 0.0.0.0 указан явно: хостинги определяют готовность сервиса
+  // сканированием внешнего интерфейса, а не loopback.
+  await app.listen(port, '0.0.0.0');
 
   new Logger('Bootstrap').log(`Приложение слушает http://localhost:${port}`);
 }

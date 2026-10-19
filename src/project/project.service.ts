@@ -13,13 +13,6 @@ export class ProjectService {
     });
   }
 
-  findByProfileId(profileId: number): Promise<Project[]> {
-    return this.prisma.project.findMany({
-      where: { profileId },
-      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
-    });
-  }
-
   findByProfileIds(profileIds: number[]): Promise<Project[]> {
     return this.prisma.project.findMany({
       where: { profileId: { in: profileIds } },

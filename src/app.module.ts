@@ -7,6 +7,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { formatGraphQLError } from './common/format-graphql-error.js';
 import { ExperienceModule } from './experience/experience.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
+import { RootController } from './root.controller.js';
 import { ProfileModule } from './profile/profile.module.js';
 import { ProjectModule } from './project/project.module.js';
 import { SkillModule } from './skill/skill.module.js';
@@ -28,5 +29,6 @@ import { SkillModule } from './skill/skill.module.js';
     ExperienceModule,
     ProjectModule,
   ],
+  controllers: [RootController],
 })
 export class AppModule {}
